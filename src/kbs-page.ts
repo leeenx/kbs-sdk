@@ -1,4 +1,11 @@
-import { getDslUrl, getParams, navigate, createWxMpRoute } from "./utils";
+import {
+  getDslUrl,
+  getParams,
+  getParam,
+  navigate,
+  createWxMpRoute,
+  getCurrentPage
+} from "./utils";
 import { createPageHooks } from "./hooks/page";
 import * as useAppHooks from './hooks/app';
 import {
@@ -10,7 +17,10 @@ import type { KbsPageOptions, PageHooks } from "./type";
 // 跳转
 registerToGlobleScope({
   createWxMpRoute, // 创建微信的页面路径 ---- 分享时可能会用到这个方法来生成 URL
-  navigate
+  navigate,
+  getParams,
+  getParam,
+  getCurrentPage
 });
 
 // 页面是否已经挂载 hooks
@@ -43,8 +53,7 @@ export const KbsPage = (options: KbsPageOptions) => {
     });
   }
 
-  // onShow 作为页面第一个初触发的事件，充当初始化的角色
-  const originShowHook = options.onShow;
+  const originShowHook = onShow;
 
   // 在 options 挂载勾子
   [
@@ -81,6 +90,9 @@ export const KbsPage = (options: KbsPageOptions) => {
       }
     });
   });
+  /**
+   * onShow 作为页面第一个初触发的事件，充当初始化的角色
+   */
   Object.assign(options, {
     onShow() {
       const { route, pageTitle } = getParams();
@@ -96,8 +108,7 @@ export const KbsPage = (options: KbsPageOptions) => {
         collectionOfPageHooks[nameSpace] = pageHooks;
         // 向页面作用域挂载 hooks
         registerToScope(nameSpace, {
-          ...useAppHooks, // 后续需要删除的勾子
-          ...usePageHooks, // 后续需要删除的勾子
+          nameSpace,
           kbsHooks: {
             ...useAppHooks,
             ...usePageHooks,
