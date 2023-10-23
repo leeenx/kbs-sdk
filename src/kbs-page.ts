@@ -1,0 +1,125 @@
+import { getDslUrl, getParams, navigate, createWxMpRoute } from "./utils";
+import { createPageHooks } from "./hooks/page";
+import * as useAppHooks from './hooks/app';
+import {
+  registerToGlobleScope,
+  registerToScope
+} from 'kbs-dsl-resolver';
+import type { KbsPageOptions, PageHooks } from "./type";
+
+// 跳转
+registerToGlobleScope({
+  createWxMpRoute, // 创建微信的页面路径 ---- 分享时可能会用到这个方法来生成 URL
+  navigate
+});
+
+// 页面是否已经挂载 hooks
+const setOfHasMountedHooks: Record<string, boolean> = {};
+
+// 按 pageNameSpace 存在的 pageHooks 集合
+const collectionOfPageHooks: Record<string, PageHooks> = {};
+
+const getPageNameSpace = () => {
+  const { pageNameSpace } = getParams();
+  return pageNameSpace || `default-page-name-space`;
+};
+
+// 定制 Page 方法
+export const KbsPage = (options: KbsPageOptions) => {
+  const {
+    watch = false,
+    watchOptions = null,
+    defaultKbsRoute = '',
+    defaultContainer,
+    headlessContainer,
+    dslBase,
+    onShow
+  } = options;
+  if (dslBase) {
+    registerToGlobleScope({
+      defaultContainer,
+      headlessContainer,
+      dslBase
+    });
+  }
+
+  // onShow 作为页面第一个初触发的事件，充当初始化的角色
+  const originShowHook = options.onShow;
+
+  // 在 options 挂载勾子
+  [
+    'onLoad',
+    'onShow',
+    'onReady',
+    'onHide',
+    'onUnload',
+    'onRouteDone',
+    'onPullDownRefresh',
+    'onReachBottom',
+    'onPageScroll',
+    'onAddToFavorites',
+    'onShareAppMessage',
+    'onShareTimeline',
+    'onResize',
+    'onTabItemTap',
+    'onSaveExitState'
+  ].forEach(key => {
+    const hook = options[key];
+    Object.assign(options, {
+      [key](...args) {
+        // 首先，保证原始 options 上的勾子正常执行
+        hook?.bind(this)(...args);
+        // 其次，通过 nameSpace 找到对应的页面 hooks
+        const nameSpace = getPageNameSpace();
+        const result = collectionOfPageHooks[nameSpace]?.[key]?.(...args);
+        if (key === 'onUnload') {
+          // 卸载
+          delete collectionOfPageHooks[nameSpace];
+          delete setOfHasMountedHooks[nameSpace];
+        }
+        return result;
+      }
+    });
+  });
+  Object.assign(options, {
+    onShow() {
+      const { route, pageTitle } = getParams();
+      if (pageTitle) {
+        wx.setNavigationBarTitle({ title: pageTitle });
+      }
+      // 生成页面的唯一标记
+      const nameSpace = getPageNameSpace();
+      if (!setOfHasMountedHooks[nameSpace]) {
+        // 创建页面 hooks
+        const { pageHooks, usePageHooks } = createPageHooks();
+        // pageHooks 推入集合
+        collectionOfPageHooks[nameSpace] = pageHooks;
+        // 向页面作用域挂载 hooks
+        registerToScope(nameSpace, {
+          ...useAppHooks, // 后续需要删除的勾子
+          ...usePageHooks, // 后续需要删除的勾子
+          kbsHooks: {
+            ...useAppHooks,
+            ...usePageHooks,
+          }
+        });
+        setOfHasMountedHooks[nameSpace] = true;
+      }
+      // onShow 需要手动触发
+      originShowHook?.();
+      collectionOfPageHooks[nameSpace].onShow?.();
+      // 以上为动态挂载
+      this.setData({
+        props: {
+          watch,
+          watchOptions,
+          url: getDslUrl(route || defaultKbsRoute),
+          nameSpace
+        }
+      });
+    }
+  });
+  return Page(options);
+};
+
+export default KbsPage;
