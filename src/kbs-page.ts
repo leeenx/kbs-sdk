@@ -16,6 +16,7 @@ import type { KbsPageOptions, PageHooks } from "./type";
 
 // 跳转
 registerToGlobleScope({
+  env: 'wechat-miniprogram',
   createWxMpRoute, // 创建微信的页面路径 ---- 分享时可能会用到这个方法来生成 URL
   navigate,
   getParams,
