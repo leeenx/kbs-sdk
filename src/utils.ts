@@ -1,4 +1,5 @@
-import { globalScope } from 'kbs-dsl-resolver';
+import load from 'kbs-dsl-loader';
+import resolveModule, { globalScope } from 'kbs-dsl-resolver';
 import type { NavigateConfig } from './type';
 
 // 获取当前页面
@@ -88,4 +89,27 @@ export const navigate = (
   } else {
     wx.navigateTo(options);
   }
-})
+});
+
+interface ImportModuleParams {
+  path: string;
+  fromHtml?: boolean;
+};
+const importModuleCache: Record<string, Promise<any>> = {};
+export const importModule = ({ path, fromHtml = true }: ImportModuleParams) => {
+  let moduleCache = importModuleCache[path];
+  if (moduleCache) return moduleCache;
+  importModuleCache[path] = moduleCache = new Promise(async (resolve, reject) => {
+    try {
+      const moduleCode = await load({
+        url: getDslUrl(path),
+        fromHtml
+      });
+      resolve(resolveModule(moduleCode));
+    } catch (err) {
+      reject(err);
+      delete importModuleCache[path];
+    }
+  });
+  return moduleCache;
+};
