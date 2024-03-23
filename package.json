@@ -1,6 +1,6 @@
 {
   "name": "kbs-sdk",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "",
   "main": "./dist/index.ts",
   "miniprogram": "./dist",
@@ -17,11 +17,6 @@
     "url": "https://github.com/leeenx/kbs-sdk/issues"
   },
   "homepage": "https://github.com/leeenx/kbs-sdk#readme",
-  "dependencies": {
-    "@babel/runtime": "^7.23.1",
-    "kbs-dsl-loader": "^1.0.6",
-    "kbs-dsl-resolver": "^1.1.1"
-  },
   "devDependencies": {
     "@babel/parser": "^7.23.0",
     "@babel/plugin-transform-runtime": "^7.22.15",
