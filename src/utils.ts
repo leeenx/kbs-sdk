@@ -101,7 +101,7 @@ export const importModule = ({ path, saveToStorage = false }: ImportModuleParams
   if (moduleCache) return moduleCache;
   importModuleCache[path] = moduleCache = new Promise(async (resolve, reject) => {
     try {
-      const moduleCode = await load(getDslUrl(path), saveToStorage);
+      const moduleCode = await load(path, saveToStorage);
       resolve(resolveModule(moduleCode));
     } catch (err) {
       reject(err);
@@ -110,3 +110,5 @@ export const importModule = ({ path, saveToStorage = false }: ImportModuleParams
   });
   return moduleCache;
 };
+
+export { fromHtml };

@@ -3,7 +3,7 @@ import {
   getParams,
   getParam,
   navigate,
-  createWxMpRoute,
+  createRoute,
   getCurrentPage
 } from "./utils";
 import { createPageHooks } from "./hooks/page";
@@ -16,7 +16,7 @@ import type { KbsPageOptions, PageHooks } from "./type";
 
 // 跳转
 registerToGlobleScope({
-  createWxMpRoute, // 创建微信的页面路径 ---- 分享时可能会用到这个方法来生成 URL
+  createRoute, // 创建微信的页面路径 ---- 分享时可能会用到这个方法来生成 URL
   navigate,
   getParams,
   getParam,

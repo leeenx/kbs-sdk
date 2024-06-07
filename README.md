@@ -60,11 +60,11 @@ KbsPage({
  「小程序路由」是最终要作用于小程序的路由，而「kbs-dsl-maker」的路由是一种逻辑上的短路由，通过转换规则可以生成「小程序路由」。在这里「小程序路由」是不友好 的，所以在「kbs-dsl-maker」中直接使用 web路由做为逻辑路由。「kbs-sdk」提供了两个方法，如下：
 
  - navigate
- - createWxMpRoute
+ - createRoute
 
 ```typescript
-function createWxMpRoute(route: string, params: any, headless: boolean): string;
+function createRoute(route: string, params: any, headless: boolean): string;
 function navigate(route: string, params: any, config?: NavigateConfig): Promise<void>;
 ```
 
-在「kbs-dsl-maker」中，使用「navigate」作页面跳转；使用「createWxMpRoute」可以返回「小程序路由」，在分享或是生成页面二维码等场景可使用。
+在「kbs-dsl-maker」中，使用「navigate」作页面跳转；使用「createRoute」可以返回「小程序路由」，在分享或是生成页面二维码等场景可使用。
