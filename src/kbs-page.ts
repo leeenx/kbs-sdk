@@ -1,4 +1,5 @@
 import {
+  fromHtml,
   getDslUrl,
   getParams,
   getParam,
@@ -37,7 +38,6 @@ const getPageNameSpace = () => {
 // 定制 Page 方法
 export const KbsPage = (options: KbsPageOptions) => {
   const {
-    watch = false,
     watchOptions = null,
     defaultKbsRoute = '',
     defaultContainer,
@@ -94,7 +94,7 @@ export const KbsPage = (options: KbsPageOptions) => {
    * onShow 作为页面第一个初触发的事件，充当初始化的角色
    */
   Object.assign(options, {
-    onShow() {
+    async onShow() {
       const { route, pageTitle } = getParams();
       if (pageTitle) {
         wx.setNavigationBarTitle({ title: pageTitle });
@@ -119,14 +119,10 @@ export const KbsPage = (options: KbsPageOptions) => {
       // onShow 需要手动触发
       originShowHook?.();
       collectionOfPageHooks[nameSpace].onShow?.();
+      const url = await fromHtml(getDslUrl(route || defaultKbsRoute));
       // 以上为动态挂载
       this.setData({
-        props: {
-          watch,
-          watchOptions,
-          url: getDslUrl(route || defaultKbsRoute),
-          nameSpace
-        }
+        props: { watchOptions, url, nameSpace }
       });
     }
   });
