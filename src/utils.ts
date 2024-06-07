@@ -1,4 +1,4 @@
-import load from 'kbs-dsl-loader';
+import load, { fromHtml } from 'kbs-dsl-loader';
 import resolveModule, { globalScope } from 'kbs-dsl-resolver';
 import type { NavigateConfig } from './type';
 
@@ -32,7 +32,7 @@ export const getDslUrl = (route: string) => {
 };
 
 // 返回微信小程的路由
-export const createWxMpRoute = (route: string, params: any, headless: boolean) => {
+export const createRoute = (route: string, params: any, headless: boolean) => {
   const {
     defaultContainer,
     headlessContainer
@@ -78,7 +78,7 @@ export const navigate = (
 ): Promise<void> => new Promise((resolve, reject) => {
   const { replace = false, headless = false } = config || {};
   const options = {
-    url: createWxMpRoute(route, params, headless),
+    url: createRoute(route, params, headless),
     success: () => resolve(void 0),
     fail() {
       reject(new Error(`navigate 失败: + ${JSON.stringify({ route, params, replace })}`));
@@ -93,18 +93,15 @@ export const navigate = (
 
 interface ImportModuleParams {
   path: string;
-  fromHtml?: boolean;
+  saveToStorage?: boolean;
 };
 const importModuleCache: Record<string, Promise<any>> = {};
-export const importModule = ({ path, fromHtml = true }: ImportModuleParams) => {
+export const importModule = ({ path, saveToStorage = false }: ImportModuleParams) => {
   let moduleCache = importModuleCache[path];
   if (moduleCache) return moduleCache;
   importModuleCache[path] = moduleCache = new Promise(async (resolve, reject) => {
     try {
-      const moduleCode = await load({
-        url: getDslUrl(path),
-        fromHtml
-      });
+      const moduleCode = await load(getDslUrl(path), saveToStorage);
       resolve(resolveModule(moduleCode));
     } catch (err) {
       reject(err);
