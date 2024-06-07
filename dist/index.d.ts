@@ -21,7 +21,7 @@ interface NavigateConfig {
 
 interface ImportModuleParams {
   path: string;
-  fromHtml?: boolean;
+  saveToStorage?: boolean;
 }
 
 declare module 'kbs-sdk' {
