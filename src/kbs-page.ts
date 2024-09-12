@@ -120,7 +120,11 @@ export const KbsPage = (options: KbsPageOptions) => {
       originShowHook?.();
       collectionOfPageHooks[nameSpace].onShow?.();
       const url = await fromHtml(getDslUrl(route || defaultKbsRoute));
-      const pageName = getParam('page');
+      let pageName = getParam('page');
+      if (pageName) {
+        pageName = pageName.replace(/[-_]+|^(.)?/g, (match, letter) => letter.toUpperCase());
+        pageName = pageName.replace(/^\w/, pageName[0].toUpperCase());
+      }
       // 以上为动态挂载
       this.setData({
         props: { watchOptions, url, nameSpace, pageName }
