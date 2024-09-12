@@ -120,9 +120,10 @@ export const KbsPage = (options: KbsPageOptions) => {
       originShowHook?.();
       collectionOfPageHooks[nameSpace].onShow?.();
       const url = await fromHtml(getDslUrl(route || defaultKbsRoute));
+      const pageName = getParam('page');
       // 以上为动态挂载
       this.setData({
-        props: { watchOptions, url, nameSpace }
+        props: { watchOptions, url, nameSpace, pageName }
       });
     }
   });
