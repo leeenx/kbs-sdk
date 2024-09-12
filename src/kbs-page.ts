@@ -40,18 +40,18 @@ export const KbsPage = (options: KbsPageOptions) => {
   const {
     watchOptions = null,
     defaultKbsRoute = '',
-    defaultContainer,
-    headlessContainer,
-    dslBase,
+    // defaultContainer,
+    // headlessContainer,
+    // dslBase,
     onShow
   } = options;
-  if (dslBase) {
-    registerToGlobleScope({
-      defaultContainer,
-      headlessContainer,
-      dslBase
-    });
-  }
+  // if (dslBase) {
+  //   registerToGlobleScope({
+  //     defaultContainer,
+  //     headlessContainer,
+  //     dslBase
+  //   });
+  // }
 
   const originShowHook = onShow;
 

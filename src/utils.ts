@@ -66,7 +66,7 @@ export const createRoute = (route: string, params: any, headless: boolean) => {
    * 必传参数：pageNameSpace
    * pageNameSpace 是用来区分页面栈里的路由的。因为多路由使用同一页面，不会产生新的页面对象；
    * 即 Page 方法只会在启动APP 的时候被调用，创建页面路由的时候不会被再次调用，需要一个额外的
-   * 唯一值来做页面路由标记。每个页面路由需要一个独立的作用域，默认使用 pageNameSpace 
+   * 唯一值来做页面路由标记。每个页面路由需要一个独立的作用域，默认使用 pageNameSpace
    */
   return `${wxRoute}&pageNameSpace=${Date.now()}`;
 }
@@ -102,7 +102,9 @@ export const importModule = ({ path, saveToStorage = false }: ImportModuleParams
   importModuleCache[path] = moduleCache = new Promise(async (resolve, reject) => {
     try {
       const moduleCode = await load(path, saveToStorage);
+      const start = Date.now();
       resolve(resolveModule(moduleCode));
+      console.log('####### 模块解析时间：', Date.now() - start);
     } catch (err) {
       reject(err);
       delete importModuleCache[path];
