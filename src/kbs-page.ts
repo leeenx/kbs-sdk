@@ -109,6 +109,7 @@ export const KbsPage = (options: KbsPageOptions) => {
         // 向页面作用域挂载 hooks
         registerToScope(nameSpace, {
           nameSpace,
+          pagePointer: this,
           kbsHooks: {
             ...useAppHooks,
             ...usePageHooks,
@@ -119,7 +120,7 @@ export const KbsPage = (options: KbsPageOptions) => {
       // onShow 需要手动触发
       originShowHook?.();
       collectionOfPageHooks[nameSpace].onShow?.();
-      const url = await fromHtml(getDslUrl(route || defaultKbsRoute));
+      const url = await fromHtml(getDslUrl(route ? decodeURIComponent(route) : defaultKbsRoute));
       let pageName = getParam('page');
       if (pageName) {
         pageName = pageName.replace(/[-_]+|^(.)?/g, (match, letter) => letter.toUpperCase());

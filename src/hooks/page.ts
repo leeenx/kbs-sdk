@@ -14,7 +14,7 @@ import type {
   UseShareTimelineCallback,
   UseResizeCallback,
   UseTabItemTapCallback,
-  UseSaveExitStateCallback
+  UseSaveExitStateCallback,
 } from "../type";
 
 const EMPTY_CALL: (res?: any) => any = () => {};
@@ -39,7 +39,7 @@ export const createPageHooks = () => {
     onShareTimeline: EMPTY_CALL,
     onResize: EMPTY_CALL,
     onTabItemTap: EMPTY_CALL,
-    onSaveExitState: EMPTY_CALL
+    onSaveExitState: EMPTY_CALL,
   };
   const usePageHooks = {
     useLoad(callback?: UseLoadCallback) {
@@ -86,7 +86,7 @@ export const createPageHooks = () => {
     },
     useSaveExitState(callback?: UseSaveExitStateCallback) {
       callback && (pageHooks.onSaveExitState = callback);
-    }
+    },
   };
   return { pageHooks, usePageHooks };
 };
