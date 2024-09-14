@@ -128,6 +128,7 @@ export const KbsPage = (options: KbsPageOptions) => {
       }
       // 以上为动态挂载
       const props = this.data?.props || {};
+      console.log('+++++++ props', props);
       this.setData({
         props: { watchOptions, url, nameSpace, pageName, ...props }
       });
