@@ -127,8 +127,9 @@ export const KbsPage = (options: KbsPageOptions) => {
         pageName = pageName.replace(/^\w/, pageName[0].toUpperCase());
       }
       // 以上为动态挂载
+      const props = this.data?.props || {};
       this.setData({
-        props: { watchOptions, url, nameSpace, pageName }
+        props: { watchOptions, url, nameSpace, pageName, ...props }
       });
     }
   });
