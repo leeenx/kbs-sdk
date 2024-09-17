@@ -1,5 +1,6 @@
-import load, { fromHtml } from 'kbs-dsl-loader';
+//@ts-ignore
 import resolveModule, { globalScope } from 'kbs-dsl-resolver';
+import load, { fromHtml, importModule } from 'kbs-dsl-loader';
 import type { NavigateConfig } from './type';
 
 // 获取当前页面
@@ -91,26 +92,4 @@ export const navigate = (
   }
 });
 
-interface ImportModuleParams {
-  path: string;
-  saveToStorage?: boolean;
-};
-const importModuleCache: Record<string, Promise<any>> = {};
-export const importModule = ({ path, saveToStorage = false }: ImportModuleParams) => {
-  let moduleCache = importModuleCache[path];
-  if (moduleCache) return moduleCache;
-  importModuleCache[path] = moduleCache = new Promise(async (resolve, reject) => {
-    try {
-      const moduleCode = await load(path, saveToStorage);
-      const start = Date.now();
-      resolve(resolveModule(moduleCode));
-      console.log('####### 模块解析时间：', Date.now() - start);
-    } catch (err) {
-      reject(err);
-      delete importModuleCache[path];
-    }
-  });
-  return moduleCache;
-};
-
-export { fromHtml };
+export { fromHtml, importModule };

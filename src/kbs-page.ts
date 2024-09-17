@@ -9,10 +9,8 @@ import {
 } from "./utils";
 import { createPageHooks } from "./hooks/page";
 import * as useAppHooks from './hooks/app';
-import {
-  registerToGlobleScope,
-  registerToScope
-} from 'kbs-dsl-resolver';
+//@ts-ignore
+import { registerToGlobleScope, registerToScope } from 'kbs-dsl-resolver';
 import type { KbsPageOptions, PageHooks } from "./type";
 
 // 跳转
@@ -128,7 +126,6 @@ export const KbsPage = (options: KbsPageOptions) => {
       }
       // 以上为动态挂载
       const props = this.data?.props || {};
-      console.log('+++++++ props', props);
       this.setData({
         props: { watchOptions, url, nameSpace, pageName, ...props }
       });
