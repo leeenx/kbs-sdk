@@ -52,11 +52,6 @@ export const KbsPage = (options: KbsPageOptions) => {
 
   const originLoadHook = onLoad;
 
-  let pageId: string = '';
-
-  // 当前页面
-  let currentPage: WechatMiniprogram.Page.Instance<WechatMiniprogram.IAnyObject, WechatMiniprogram.IAnyObject> | null = null;
-
   // 在 options 挂载勾子
   [
     'onLoad',
@@ -78,6 +73,7 @@ export const KbsPage = (options: KbsPageOptions) => {
     const hook = options[key];
     Object.assign(options, {
       [key](...args) {
+        const { pageId = '' } = this;
         // 首先，保证原始 options 上的勾子正常执行
         hook?.bind(this)(...args);
         // 其次，通过 pId 找到对应的页面 hooks
@@ -103,9 +99,10 @@ export const KbsPage = (options: KbsPageOptions) => {
       // route 是分包路径，作为 nameSpace
       const nameSpace = getParam('route');
       // 生成页面的唯一标记
-      pageId = getPageId();
+      this.pageId = getPageId();
       // 当前页面
-      currentPage = getCurrentPage();
+      this.currentPage = getCurrentPage();
+      const { pageId = '', currentPage = null } = this;
       if (!setOfHasMountedHooks[pageId]) {
         // 创建页面 hooks
         const { pageHooks, usePageHooks } = createPageHooks();
