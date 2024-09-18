@@ -5,7 +5,7 @@ import {
   getParam,
   navigate,
   createRoute,
-  getCurrentPage
+  getCurrentPage,
 } from "./utils";
 import { createPageHooks } from "./hooks/page";
 import * as useAppHooks from './hooks/app';
@@ -19,18 +19,17 @@ registerToGlobleScope({
   navigate,
   getParams,
   getParam,
-  getCurrentPage
 });
 
 // 页面是否已经挂载 hooks
 const setOfHasMountedHooks: Record<string, boolean> = {};
 
-// 按 pageNameSpace 存在的 pageHooks 集合
+// 按 pageId 存在的 pageHooks 集合
 const collectionOfPageHooks: Record<string, PageHooks> = {};
 
-const getPageNameSpace = () => {
-  const { pageNameSpace } = getParams();
-  return pageNameSpace || `default-page-name-space`;
+const getPageId = () => {
+  const { pId } = getParams();
+  return pId || `default-page-id`;
 };
 
 // 定制 Page 方法
@@ -41,7 +40,7 @@ export const KbsPage = (options: KbsPageOptions) => {
     // defaultContainer,
     // headlessContainer,
     // dslBase,
-    onShow
+    onLoad
   } = options;
   // if (dslBase) {
   //   registerToGlobleScope({
@@ -51,7 +50,12 @@ export const KbsPage = (options: KbsPageOptions) => {
   //   });
   // }
 
-  const originShowHook = onShow;
+  const originLoadHook = onLoad;
+
+  let pageId: string = '';
+
+  // 当前页面
+  let currentPage: WechatMiniprogram.Page.Instance<WechatMiniprogram.IAnyObject, WechatMiniprogram.IAnyObject> | null = null;
 
   // 在 options 挂载勾子
   [
@@ -76,48 +80,57 @@ export const KbsPage = (options: KbsPageOptions) => {
       [key](...args) {
         // 首先，保证原始 options 上的勾子正常执行
         hook?.bind(this)(...args);
-        // 其次，通过 nameSpace 找到对应的页面 hooks
-        const nameSpace = getPageNameSpace();
-        const result = collectionOfPageHooks[nameSpace]?.[key]?.(...args);
+        // 其次，通过 pId 找到对应的页面 hooks
+        const result = collectionOfPageHooks[pageId]?.[key]?.(...args);
         if (key === 'onUnload') {
           // 卸载
-          delete collectionOfPageHooks[nameSpace];
-          delete setOfHasMountedHooks[nameSpace];
+          delete collectionOfPageHooks[pageId];
+          delete setOfHasMountedHooks[pageId];
         }
         return result;
       }
     });
   });
   /**
-   * onShow 作为页面第一个初触发的事件，充当初始化的角色
+   * onLoad 作为页面第一个初触发的事件，充当初始化的角色
    */
   Object.assign(options, {
-    async onShow() {
+    async onLoad(query: Object) {
       const { route, pageTitle } = getParams();
       if (pageTitle) {
         wx.setNavigationBarTitle({ title: pageTitle });
       }
+      // route 是分包路径，作为 nameSpace
+      const nameSpace = getParam('route');
       // 生成页面的唯一标记
-      const nameSpace = getPageNameSpace();
-      if (!setOfHasMountedHooks[nameSpace]) {
+      pageId = getPageId();
+      // 当前页面
+      currentPage = getCurrentPage();
+      if (!setOfHasMountedHooks[pageId]) {
         // 创建页面 hooks
         const { pageHooks, usePageHooks } = createPageHooks();
         // pageHooks 推入集合
-        collectionOfPageHooks[nameSpace] = pageHooks;
+        collectionOfPageHooks[pageId] = pageHooks;
         // 向页面作用域挂载 hooks
         registerToScope(nameSpace, {
+          pageId,
           nameSpace,
           pagePointer: this,
           kbsHooks: {
             ...useAppHooks,
             ...usePageHooks,
-          }
+          },
+          // 返回自定义方法，可以直接获取当前页面的对象与参数
+          currentPage,
+          getCurrentPage: () => currentPage,
+          getCurrentParams: () => currentPage?.options,
+          getCurrentParam: (key: string) => currentPage?.options?.[key]
         });
-        setOfHasMountedHooks[nameSpace] = true;
+        setOfHasMountedHooks[pageId] = true;
       }
-      // onShow 需要手动触发
-      originShowHook?.();
-      collectionOfPageHooks[nameSpace].onShow?.();
+      // onLoad 需要手动触发
+      originLoadHook?.();
+      collectionOfPageHooks[pageId].onLoad?.(query);
       const url = await fromHtml(getDslUrl(route ? decodeURIComponent(route) : defaultKbsRoute));
       let pageName = getParam('page');
       if (pageName) {
@@ -127,7 +140,7 @@ export const KbsPage = (options: KbsPageOptions) => {
       // 以上为动态挂载
       const props = this.data?.props || {};
       this.setData({
-        props: { watchOptions, url, nameSpace, pageName, ...props }
+        props: { watchOptions, url, nameSpace, pageId, pageName, ...props }
       });
     }
   });

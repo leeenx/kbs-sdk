@@ -1,6 +1,7 @@
 //@ts-ignore
-import resolveModule, { globalScope } from 'kbs-dsl-resolver';
-import load, { fromHtml, importModule } from 'kbs-dsl-loader';
+import { globalScope } from 'kbs-dsl-resolver';
+// @ts-ignore
+import { fromHtml, importModule } from 'kbs-dsl-loader';
 import type { NavigateConfig } from './type';
 
 // 获取当前页面
@@ -65,11 +66,11 @@ export const createRoute = (route: string, params: any, headless: boolean) => {
   }
   /**
    * 必传参数：pageNameSpace
-   * pageNameSpace 是用来区分页面栈里的路由的。因为多路由使用同一页面，不会产生新的页面对象；
+   * pId 是用来区分页面栈里的路由的。因为多路由使用同一页面，不会产生新的页面对象；
    * 即 Page 方法只会在启动APP 的时候被调用，创建页面路由的时候不会被再次调用，需要一个额外的
-   * 唯一值来做页面路由标记。每个页面路由需要一个独立的作用域，默认使用 pageNameSpace
+   * 唯一值来做页面路由标记。每个页面路由需要一个独立的作用域，默认使用 pId
    */
-  return `${wxRoute}&pageNameSpace=${Date.now()}`;
+  return `${wxRoute}&pId=${Date.now()}`;
 }
 
 export const navigate = (
@@ -82,7 +83,7 @@ export const navigate = (
     url: createRoute(route, params, headless),
     success: () => resolve(void 0),
     fail() {
-      reject(new Error(`navigate 失败: + ${JSON.stringify({ route, params, replace })}`));
+      reject(new Error(`navigate 失败: ${JSON.stringify({ route, params, replace })}`));
     }
   };
   if (replace) {

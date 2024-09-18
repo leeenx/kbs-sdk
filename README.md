@@ -68,3 +68,12 @@ function navigate(route: string, params: any, config?: NavigateConfig): Promise<
 ```
 
 在「kbs-dsl-maker」中，使用「navigate」作页面跳转；使用「createRoute」可以返回「小程序路由」，在分享或是生成页面二维码等场景可使用。
+
+## 内置对象与方法
+
+- currentPage 当前页面对象
+- getCurrentPage 获取当前页面对象
+- getCurrentParams 获取当前页面的 params
+- getCurrentParam 按 key 获取当面页面的 param
+- getParams 获取当前展示页面的 params
+- getParam 按 key 获取 当前展示页面的 param
