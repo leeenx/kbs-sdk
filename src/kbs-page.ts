@@ -134,10 +134,11 @@ export const KbsPage = (options: KbsPageOptions) => {
         pageName = pageName.replace(/[-_]+|^(.)?/g, (match, letter) => letter.toUpperCase());
         pageName = pageName.replace(/^\w/, pageName[0].toUpperCase());
       }
+      const cacheCount = getParam('cacheCount') || 2; // 默认开启两个缓存
       // 以上为动态挂载
       const props = this.data?.props || {};
       this.setData({
-        props: { watchOptions, url, nameSpace, pageId, pageName, ...props }
+        props: { watchOptions, url, nameSpace, pageId, pageName, cacheCount, ...props }
       });
     }
   });
