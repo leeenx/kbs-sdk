@@ -70,7 +70,8 @@ export const createRoute = (route: string, params: any, headless: boolean) => {
    * 即 Page 方法只会在启动APP 的时候被调用，创建页面路由的时候不会被再次调用，需要一个额外的
    * 唯一值来做页面路由标记。每个页面路由需要一个独立的作用域，默认使用 pId
    */
-  return `${wxRoute}&pId=${Date.now()}`;
+  // return `${wxRoute}&pId=${Date.now()}`;
+  return wxRoute;
 }
 
 export const navigate = (

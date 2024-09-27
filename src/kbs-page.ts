@@ -27,9 +27,12 @@ const setOfHasMountedHooks: Record<string, boolean> = {};
 // 按 pageId 存在的 pageHooks 集合
 const collectionOfPageHooks: Record<string, PageHooks> = {};
 
+let pageIndex: number = 0;
+
 const getPageId = () => {
+  // 默认从 url 上获取
   const { pId } = getParams();
-  return pId || `default-page-id`;
+  return pId || `${pageIndex++}`;
 };
 
 // 定制 Page 方法
